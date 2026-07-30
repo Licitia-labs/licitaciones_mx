@@ -1,117 +1,278 @@
-<!doctype html>
+<!DOCTYPE html><script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Licitaciones Mexico Panel",
+  "schemaVersion": 1,
+  "description": "Panel de licitaciones públicas de México (Compras MX / ex-CompraNet). Muestra convocatorias recientes encontradas por búsqueda web, con enlaces al portal oficial y a la API de datos abiertos. Se actualiza mediante tarea programada semanal (no hay conector MCP para Compras MX, así que no puede jalar datos en vivo directamente desde el navegador)."
+}
+</script>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Panel demostrativo de oportunidades de contratación pública en México.">
-  <meta name="theme-color" content="#0b1f3a">
-  <title>LicitIA | Licitaciones públicas en México</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/styles.css">
-  <script src="./assets/app.js" defer></script>
+<meta charset="UTF-8">
+<title>Panel de Licitaciones Públicas — Compras MX</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: #f7f7f5;
+    color: #1a1a1a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; position: relative; }
+  .brand-logo { position: absolute; top: 0; right: 0; font-size: 12px; font-weight: 700; letter-spacing: .04em; color: #999; opacity: 0.55; }
+  h1 { font-size: 22px; margin: 0; }
+  .subtitle { color: #666; font-size: 13px; margin-bottom: 18px; }
+  .meta-bar {
+    display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px;
+  }
+  .meta-card {
+    background: #fff; border: 1px solid #e5e5e0; border-radius: 10px;
+    padding: 12px 16px; flex: 1; min-width: 180px;
+  }
+  .meta-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #888; }
+  .meta-card .value { font-size: 16px; font-weight: 600; margin-top: 2px; }
+  .section-title { font-size: 15px; font-weight: 600; margin: 24px 0 10px 0; }
+
+  table.lic-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #e5e5e0;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 12.5px;
+    table-layout: fixed;
+  }
+  table.lic-table thead { display: table-header-group; }
+  table.lic-table th {
+    text-align: left;
+    background: #f0f0ec;
+    color: #444;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    padding: 8px 10px;
+    border-bottom: 1px solid #e5e5e0;
+  }
+  table.lic-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  table.lic-table tr:last-child td { border-bottom: none; }
+  table.lic-table tr { page-break-inside: avoid; break-inside: avoid; }
+  table.lic-table a { color: #1a1a1a; }
+  .col-dep { width: 22%; }
+  .col-exp { width: 16%; }
+  .col-desc { width: 32%; }
+  .col-fecha { width: 18%; }
+  .col-fuente { width: 12%; }
+
+  .links-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .link-btn {
+    display: inline-block; padding: 8px 14px; background: #fff; border: 1px solid #d8d8d2;
+    border-radius: 8px; text-decoration: none; color: #1a1a1a; font-size: 13px;
+  }
+  .link-btn:hover { background: #f0f0ec; }
+  footer { margin-top: 26px; font-size: 12px; color: #999; }
+
+  @media print {
+    @page { size: letter; margin: 12mm; }
+    html, body { width: auto; height: auto; }
+    body { background: #fff; padding: 0; font-size: 10px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .wrap { max-width: 100%; }
+    .brand-logo { opacity: 0.4; }
+    .meta-bar, .links-row, footer { page-break-inside: avoid; }
+    .meta-card { padding: 8px 10px; }
+    .section-title { margin: 12px 0 6px 0; }
+    table.lic-table { font-size: 9px; border-radius: 0; }
+    table.lic-table th, table.lic-table td { padding: 5px 6px; }
+    .links-row { margin-top: 8px; }
+    footer { margin-top: 10px; font-size: 9px; }
+  }
+</style>
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="#inicio" aria-label="LicitIA, inicio">Licit<span>i</span>A</a>
-    <button class="menu-button" type="button" aria-expanded="false" aria-controls="main-nav">Menú</button>
-    <nav id="main-nav" aria-label="Navegación principal">
-      <a class="active" href="#inicio">Inicio</a>
-      <a href="#oportunidades">Oportunidades</a>
-      <a href="#fuentes">Fuentes oficiales</a>
-      <a href="#metodologia">Metodología</a>
-    </nav>
-  </header>
+<div class="wrap">
+  <div class="brand-logo">LicitIA</div>
+  <h1>Panel de Licitaciones Públicas — Compras MX</h1>
+  <div class="subtitle" id="updated-line">Última actualización: cargando…</div>
 
-  <main id="inicio">
-    <section class="hero" aria-labelledby="page-title">
-      <p class="eyebrow">Inteligencia para competir mejor</p>
-      <h1 id="page-title">Licitaciones públicas en México</h1>
-      <p class="subtitle">Explora oportunidades demostrativas y consulta directamente las fuentes oficiales.</p>
+  <div class="meta-bar">
+    <div class="meta-card">
+      <div class="label">Fuente base</div>
+      <div class="value">Compras MX (antes CompraNet)</div>
+    </div>
+    <div class="meta-card">
+      <div class="label">Registros en este panel</div>
+      <div class="value" id="count-value">—</div>
+    </div>
+    <div class="meta-card">
+      <div class="label">Refresco</div>
+      <div class="value">Diario (tarea programada)</div>
+    </div>
+  </div>
 
-      <form id="search-form" class="search-panel" role="search">
-        <label class="search-box">
-          <span class="sr-only">Buscar oportunidades</span>
-          <span aria-hidden="true">⌕</span>
-          <input id="query" type="search" placeholder="Buscar por palabra clave, producto o servicio" autocomplete="off">
-        </label>
-        <div class="filters">
-          <label>
-            <span>Dependencia</span>
-            <select id="agency">
-              <option value="">Todas</option>
-            </select>
-          </label>
-          <label>
-            <span>Estado</span>
-            <select id="state">
-              <option value="">Todos</option>
-            </select>
-          </label>
-          <label>
-            <span>Sector</span>
-            <select id="sector">
-              <option value="">Todos</option>
-            </select>
-          </label>
-          <label>
-            <span>Fecha límite</span>
-            <select id="deadline">
-              <option value="">Cualquier fecha</option>
-              <option value="30">Próximos 30 días</option>
-              <option value="60">Próximos 60 días</option>
-              <option value="90">Próximos 90 días</option>
-            </select>
-          </label>
-          <button class="primary-button" type="submit">Buscar oportunidades</button>
-        </div>
-      </form>
+  <div class="section-title">Licitaciones encontradas en la revisión más reciente</div>
+  <table class="lic-table">
+    <thead>
+      <tr>
+        <th class="col-dep">Dependencia</th>
+        <th class="col-exp">Expediente / Referencia</th>
+        <th class="col-desc">Descripción</th>
+        <th class="col-fecha">Fecha / Estatus</th>
+        <th class="col-fuente">Fuente</th>
+      </tr>
+    </thead>
+    <tbody id="lic-tbody"></tbody>
+  </table>
 
-      <div class="metrics" aria-label="Resumen del panel">
-        <article><span class="metric-icon">↗</span><div><strong id="result-count">6</strong><p>Resultados demostrativos</p></div></article>
-        <article><span class="metric-icon">▥</span><div><strong id="agency-count">6</strong><p>Dependencias representadas</p></div></article>
-        <article><span class="metric-icon">◇</span><div><strong id="state-count">6</strong><p>Entidades representadas</p></div></article>
-      </div>
-    </section>
-
-    <section id="oportunidades" class="results-section" aria-labelledby="results-title">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Panel demostrativo</p>
-          <h2 id="results-title">Oportunidades</h2>
-        </div>
-        <button id="clear-filters" class="text-button" type="button">Limpiar filtros</button>
-      </div>
-      <p class="notice"><strong>Importante:</strong> los registros son ejemplos de funcionamiento, no convocatorias vigentes. Verifica siempre la información en el portal oficial correspondiente.</p>
-      <div id="cards" class="cards" aria-live="polite"></div>
-      <div id="empty-state" class="empty-state" hidden>
-        <h3>No encontramos coincidencias</h3>
-        <p>Prueba con otros términos o limpia los filtros.</p>
-      </div>
-    </section>
-
-    <section id="fuentes" class="sources-section" aria-labelledby="sources-title">
-      <p class="eyebrow">Verificación directa</p>
-      <h2 id="sources-title">Fuentes oficiales</h2>
-      <div class="source-links">
-        <a href="https://comprasmx.buengobierno.gob.mx/" target="_blank" rel="noopener noreferrer">Compras MX <span>↗</span></a>
-        <a href="https://msc.cfe.mx/" target="_blank" rel="noopener noreferrer">Micrositio CFE <span>↗</span></a>
-        <a href="https://www.imss.gob.mx/proveedores" target="_blank" rel="noopener noreferrer">Proveedores IMSS <span>↗</span></a>
-        <a href="https://www.dof.gob.mx/" target="_blank" rel="noopener noreferrer">Diario Oficial <span>↗</span></a>
-      </div>
-    </section>
-
-    <section id="metodologia" class="method-section" aria-labelledby="method-title">
-      <p class="eyebrow">Alcance</p>
-      <h2 id="method-title">Cómo debe evolucionar este panel</h2>
-      <p>Esta versión funciona completamente en el navegador. Para mostrar licitaciones reales y actualizadas necesita una fuente de datos autorizada, normalización y un proceso automatizado de actualización.</p>
-    </section>
-  </main>
+  <div class="links-row">
+    <a class="link-btn" href="https://comprasmx.buengobierno.gob.mx/" target="_blank" rel="noopener">Portal Compras MX ↗</a>
+    <a class="link-btn" href="https://api.datos.gob.mx/v2/contratacionesabiertas" target="_blank" rel="noopener">API de datos abiertos ↗</a>
+    <a class="link-btn" href="https://www.datos.gob.mx/dataset/?q=api-de-contrataciones-abiertas-de-la-apf" target="_blank" rel="noopener">Dataset en datos.gob.mx ↗</a>
+  </div>
 
   <footer>
-    <strong>LicitIA Business México</strong>
-    <p>Herramienta informativa. La fuente oficial prevalece sobre cualquier dato mostrado.</p>
+    Panel generado para Geo. Los datos provienen de búsquedas web sobre convocatorias publicadas en Compras MX y
+    portales de dependencias (gob.mx). No es una réplica exhaustiva del sistema oficial — úsalo como radar, y
+    confirma cualquier licitación de interés directamente en Compras MX antes de actuar. La API de datos.gob.mx
+    (contrataciones abiertas) no respondió con datos utilizables en este refresco.
   </footer>
+</div>
+
+<script>
+const DATA = [
+  {
+    dependencia: "Municipio de Tulancingo de Bravo, Hidalgo",
+    expediente: "LA-MTB-STA-LGC34-2026",
+    descripcion: "Licitación pública municipal convocada por la Secretaría de Tesorería y Administración municipal",
+    fecha: "Publicación: 27 jul 2026 · Ventana de participación: 27-29 jul 2026",
+    fuente: "https://tulancingo.gob.mx/convocatorias-2026/convocatoria-la-mtb-sta-lgc34-2026-2/"
+  },
+  {
+    dependencia: "Birmex (compra consolidada IMSS / ISSSTE / IMSS-Bienestar / Pemex / institutos nacionales de salud)",
+    expediente: "LA-12-NEF-012NEF001-T-218-2026",
+    descripcion: "Licitación pública internacional: compra consolidada de medicamentos genéricos, oncológicos y antiinfecciosos 2027-2028 (767 claves, 108 de alta prioridad, hasta 3,536 millones de piezas); veta a proveedores incumplidos",
+    fecha: "Convocatoria: 16 jul 2026 · Junta de aclaraciones: 23 jul 2026 · Apertura de propuestas: 5 ago 2026 · Confirmada por La Jornada el 20 jul 2026",
+    fuente: "https://www.jornada.com.mx/2026/07/20/politica/009n1pol"
+  },
+  {
+    dependencia: "Secretaría de Infraestructura Pública y Desarrollo Urbano Sostenible (SIPDUS), Hidalgo",
+    expediente: "EO-SIPDUS-N77-2026",
+    descripcion: "Construcción de pavimento de concreto hidráulico en el libramiento José Francisco Osorno, localidad Las Haciendas, municipio de Apan",
+    fecha: "2026 · Licitación pública estatal vigente",
+    fuente: "https://s-infraestructura.hidalgo.gob.mx/Licitaciones"
+  },
+  {
+    dependencia: "Secretaría de Bienestar",
+    expediente: "IA-20-411-020000999-N-41-2026",
+    descripcion: "Servicio integral de alimentación para el programa Salud Casa por Casa",
+    fecha: "Contratación de servicios, ejercicio 2026",
+    fuente: "https://www.gob.mx/bienestar/documentos/contratacion-de-servicios-para-la-secretaria-de-bienestar-2026"
+  },
+  {
+    dependencia: "Secretaría de Bienestar",
+    expediente: "IA-20-411-020000999-N-45-2026",
+    descripcion: "Servicio de mantenimiento especializado de infraestructura e instalaciones",
+    fecha: "Contratación de servicios, ejercicio 2026",
+    fuente: "https://www.gob.mx/bienestar/documentos/contratacion-de-servicios-para-la-secretaria-de-bienestar-2026"
+  },
+  {
+    dependencia: "Servicios de Salud IMSS-Bienestar, Puebla",
+    expediente: "—",
+    descripcion: "Compra de pintura y material de plomería para centros de atención médica distribuidos en el estado",
+    fecha: "Proceso administrativo concluye jul 2026 · Fallo de proveedor: primera semana de ago 2026",
+    fuente: "https://intoleranciadiario.com/articles/gobierno/2026/07/26/1055779-gobierno-alista-rehabilitacion-de-unidades-del-imss-bienestar-en-puebla.html"
+  },
+  {
+    dependencia: "Comisión Estatal del Agua para el Bienestar (CEABIEN), Oaxaca",
+    expediente: "LPE-CEABIEN-005-2026 / LPE-CEABIEN-006-2026",
+    descripcion: "Construcción de plantas de tratamiento de aguas residuales en Santiago Jamiltepec y Villa Sola de Vega",
+    fecha: "Publicación: 17 jul 2026",
+    fuente: "https://www.nvinoticias.com/oaxaca/convocatorias/convocatoria-de-licitacion-publica-estatal-de-ceabien/190582"
+  },
+  {
+    dependencia: "Municipio de Tlajomulco de Zúñiga, Jalisco (Dirección de Obras Públicas)",
+    expediente: "DOP-M-RP-PAV-LP (multianual 2026)",
+    descripcion: "Rehabilitación de pavimentos por distintos métodos en vialidades de las colonias Chulavista, Santa Fe, Las Luces y Valle de Tejeda",
+    fecha: "Visita de obra: 20 jul 2026 · Junta de aclaraciones: 22 jul 2026 · Apertura: 4 ago 2026 · Inicio de obra: 17 ago 2026",
+    fuente: "https://tlajomulco.gob.mx/sites/default/files/bases_multianual_dop-m-rp-pav-lp-180-2025.pdf"
+  },
+  {
+    dependencia: "Instituto de Seguridad Social para las Fuerzas Armadas Mexicanas (ISSFAM)",
+    expediente: "LA-07-HXA-007HXA001-N-59-2026",
+    descripcion: "Licitación pública nacional electrónica: servicio de impresión de gran formato",
+    fecha: "2026",
+    fuente: "https://www.gob.mx/issfam/documentos/licitaciones-e-invitaaciones-2026?state=published"
+  },
+  {
+    dependencia: "IMSS — Coordinación de Abastecimiento y Equipamiento (CABCS), transporte",
+    expediente: "LA-50-GYR-050GYR019-N-8-2026",
+    descripcion: "Licitación pública nacional electrónica: servicio de transporte",
+    fecha: "2026",
+    fuente: "https://reposipot.imss.gob.mx/transporte/CABCS/2026/DECAL/LICIT/LA-008-2026/CONV%20LA%20N8-2026.pdf"
+  },
+  {
+    dependencia: "Instituto Nacional de Electricidad y Energías Limpias (INEEL)",
+    expediente: "LA-18-T0K-018T0K001-N-7-2026",
+    descripcion: "Licitación pública nacional electrónica: servicio de seguridad y vigilancia privada",
+    fecha: "Vigencia del servicio: 27 feb-31 dic 2026",
+    fuente: "https://www.gob.mx/ineel/acciones-y-programas/convocatorias-licitaciones-e-invitaciones"
+  },
+  {
+    dependencia: "Secretaría de Hacienda y Crédito Público",
+    expediente: "LA-06-400-006400001-N-2-2026 / N-3-2026",
+    descripcion: "Licitación pública nacional electrónica: servicio de monedero electrónico como medio de pago de combustible para vehículos terrestres, ejercicio fiscal 2026",
+    fecha: "2026",
+    fuente: "https://www.gob.mx/shcp/documentos/licitacion-publica-nacional-electronica-la-06-400-006400001-n-2-2026"
+  },
+  {
+    dependencia: "Comisión Federal de Electricidad (CFE)",
+    expediente: "CFE-0001-CAAAT-0005-2026",
+    descripcion: "Equipo para instalación de cables y accesorios eléctricos",
+    fecha: "Publicada en DOF, 2026",
+    fuente: "https://sidof.segob.gob.mx/notas/docFuente/5786145"
+  },
+  {
+    dependencia: "Hospital Juárez de México",
+    expediente: "LPN-N-60-2026",
+    descripcion: "Suministro de oxígeno medicinal y gases medicinales",
+    fecha: "2026",
+    fuente: "https://www.gob.mx/cms/uploads/attachment/file/1077876/LPN-N-60-2026.pdf"
+  },
+  {
+    dependencia: "Gobierno del Estado de Puebla",
+    expediente: "Varios",
+    descripcion: "Convocatorias vigentes de obra pública: seguridad privada (Museo Internacional del Barroco), distribución de alimentos, mantenimiento de transporte público",
+    fecha: "2026",
+    fuente: "https://licitaciones.puebla.gob.mx/index.php/obra-publica-1/convocatorias-obra-publica"
+  }
+];
+
+document.getElementById("count-value").textContent = DATA.length;
+document.getElementById("updated-line").textContent =
+  "Última actualización: " + new Date().toLocaleString("es-MX", { dateStyle: "long", timeStyle: "short" });
+
+function esc(s) {
+  const div = document.createElement("div");
+  div.textContent = s == null ? "" : String(s);
+  return div.innerHTML;
+}
+
+const tbody = document.getElementById("lic-tbody");
+tbody.innerHTML = DATA.map(d => `
+  <tr>
+    <td class="col-dep">${esc(d.dependencia)}</td>
+    <td class="col-exp">${esc(d.expediente)}</td>
+    <td class="col-desc">${esc(d.descripcion)}</td>
+    <td class="col-fecha">${esc(d.fecha)}</td>
+    <td class="col-fuente"><a href="${esc(d.fuente)}" target="_blank" rel="noopener">Ver ↗</a></td>
+  </tr>
+`).join("");
+</script>
 </body>
 </html>
