@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Panel demostrativo de oportunidades de contratación pública en México.">
+  <meta name="theme-color" content="#0b1f3a">
+  <title>LicitIA | Licitaciones públicas en México</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/styles.css">
+  <script src="./assets/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#inicio" aria-label="LicitIA, inicio">Licit<span>i</span>A</a>
+    <button class="menu-button" type="button" aria-expanded="false" aria-controls="main-nav">Menú</button>
+    <nav id="main-nav" aria-label="Navegación principal">
+      <a class="active" href="#inicio">Inicio</a>
+      <a href="#oportunidades">Oportunidades</a>
+      <a href="#fuentes">Fuentes oficiales</a>
+      <a href="#metodologia">Metodología</a>
+    </nav>
+  </header>
+
+  <main id="inicio">
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">Inteligencia para competir mejor</p>
+      <h1 id="page-title">Licitaciones públicas en México</h1>
+      <p class="subtitle">Explora oportunidades demostrativas y consulta directamente las fuentes oficiales.</p>
+
+      <form id="search-form" class="search-panel" role="search">
+        <label class="search-box">
+          <span class="sr-only">Buscar oportunidades</span>
+          <span aria-hidden="true">⌕</span>
+          <input id="query" type="search" placeholder="Buscar por palabra clave, producto o servicio" autocomplete="off">
+        </label>
+        <div class="filters">
+          <label>
+            <span>Dependencia</span>
+            <select id="agency">
+              <option value="">Todas</option>
+            </select>
+          </label>
+          <label>
+            <span>Estado</span>
+            <select id="state">
+              <option value="">Todos</option>
+            </select>
+          </label>
+          <label>
+            <span>Sector</span>
+            <select id="sector">
+              <option value="">Todos</option>
+            </select>
+          </label>
+          <label>
+            <span>Fecha límite</span>
+            <select id="deadline">
+              <option value="">Cualquier fecha</option>
+              <option value="30">Próximos 30 días</option>
+              <option value="60">Próximos 60 días</option>
+              <option value="90">Próximos 90 días</option>
+            </select>
+          </label>
+          <button class="primary-button" type="submit">Buscar oportunidades</button>
+        </div>
+      </form>
+
+      <div class="metrics" aria-label="Resumen del panel">
+        <article><span class="metric-icon">↗</span><div><strong id="result-count">6</strong><p>Resultados demostrativos</p></div></article>
+        <article><span class="metric-icon">▥</span><div><strong id="agency-count">6</strong><p>Dependencias representadas</p></div></article>
+        <article><span class="metric-icon">◇</span><div><strong id="state-count">6</strong><p>Entidades representadas</p></div></article>
+      </div>
+    </section>
+
+    <section id="oportunidades" class="results-section" aria-labelledby="results-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Panel demostrativo</p>
+          <h2 id="results-title">Oportunidades</h2>
+        </div>
+        <button id="clear-filters" class="text-button" type="button">Limpiar filtros</button>
+      </div>
+      <p class="notice"><strong>Importante:</strong> los registros son ejemplos de funcionamiento, no convocatorias vigentes. Verifica siempre la información en el portal oficial correspondiente.</p>
+      <div id="cards" class="cards" aria-live="polite"></div>
+      <div id="empty-state" class="empty-state" hidden>
+        <h3>No encontramos coincidencias</h3>
+        <p>Prueba con otros términos o limpia los filtros.</p>
+      </div>
+    </section>
+
+    <section id="fuentes" class="sources-section" aria-labelledby="sources-title">
+      <p class="eyebrow">Verificación directa</p>
+      <h2 id="sources-title">Fuentes oficiales</h2>
+      <div class="source-links">
+        <a href="https://comprasmx.buengobierno.gob.mx/" target="_blank" rel="noopener noreferrer">Compras MX <span>↗</span></a>
+        <a href="https://msc.cfe.mx/" target="_blank" rel="noopener noreferrer">Micrositio CFE <span>↗</span></a>
+        <a href="https://www.imss.gob.mx/proveedores" target="_blank" rel="noopener noreferrer">Proveedores IMSS <span>↗</span></a>
+        <a href="https://www.dof.gob.mx/" target="_blank" rel="noopener noreferrer">Diario Oficial <span>↗</span></a>
+      </div>
+    </section>
+
+    <section id="metodologia" class="method-section" aria-labelledby="method-title">
+      <p class="eyebrow">Alcance</p>
+      <h2 id="method-title">Cómo debe evolucionar este panel</h2>
+      <p>Esta versión funciona completamente en el navegador. Para mostrar licitaciones reales y actualizadas necesita una fuente de datos autorizada, normalización y un proceso automatizado de actualización.</p>
+    </section>
+  </main>
+
+  <footer>
+    <strong>LicitIA Business México</strong>
+    <p>Herramienta informativa. La fuente oficial prevalece sobre cualquier dato mostrado.</p>
+  </footer>
+</body>
+</html>
