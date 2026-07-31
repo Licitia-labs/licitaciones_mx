@@ -274,7 +274,7 @@ const DATA = [
 
 document.getElementById("count-value").textContent = DATA.length;
 document.getElementById("updated-line").textContent =
-  "Última actualización: " + new Date().toLocaleString("es-MX", { dateStyle: "long", timeStyle: "short" });
+  "Última actualización: " + new Date().toLocaleString("es-MX", { dateStyle: "long", timeStyle: "short", timeZone: "America/Mexico_City" }) + " (hora CDMX)";
 
 function esc(s) {
   const div = document.createElement("div");
